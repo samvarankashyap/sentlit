@@ -158,4 +158,4 @@ def senti_graph_plots(s_list):
     return data
 
 
-run(host='0.0.0.0', port=8000)
+run(host='0.0.0.0', port=8080)
