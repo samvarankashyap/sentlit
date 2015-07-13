@@ -11,9 +11,7 @@ import random
 import json
 from nltk.corpus import sentiwordnet as swn
 import json
-from pymongo import MongoClient
 from sets import Set
-import memcache
 import codecs
 
 # function that serves all the static files
