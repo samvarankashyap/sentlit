@@ -2,6 +2,10 @@ __author__ = "samvaran kashyap"
 __studentid__ = "1001142545"
 __netid__ = "samvaran kashyap"
 __class__ = "cloud computing section 2 3:30 to 5:30"
+#!/usr/bin/env python
+import bottle
+import subprocess
+import os
 from bottle import route, run, template
 from bottle import route, request, response, template, HTTPResponse
 import uuid
@@ -14,15 +18,22 @@ import json
 from sets import Set
 import codecs
 
+p1 = subprocess.Popen(['ip','addr','show','eth0'],stdout=subprocess.PIPE)
+p2 = subprocess.Popen(['sed','-rn',r's/\s*inet\s(([0-9]{1,3}\.){3}[0-9]{1,3}).*/\1/p'],stdin=p1.stdout,stdout=subprocess.PIPE)
+p1.stdout.close()
+ip_addr = p2.communicate()[0].strip()
+p1.wait()
+app = bottle.app()
+
 # function that serves all the static files
-@route('/static/<filename>')
+@bottle.route('/static/<filename>')
 def server_static(filename):
     return static_file(filename, root="static")
 
 # function for the index page 
-@route('/')
+@bottle.route('/')
 def index():
-    return template('index')
+    return template('index',ip_addr = ip_addr)
 
 def calculate_sentiment(word,wordno):
     s_list = swn.senti_synsets(word)
@@ -41,7 +52,7 @@ def calculate_sentiment(word,wordno):
 
 
 # handles upload
-@route('/uploadimage',  method='POST')
+@bottle.route('/uploadimage',  method='POST')
 def uploadimage():
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         upload_file = request.files.get('uploadimage')
@@ -155,5 +166,7 @@ def senti_graph_plots(s_list):
     data = [data1,data2,data3]
     return data
 
-
-run(host='0.0.0.0', port=8080)
+if __name__=='__main__':
+    bottle.debug(True)
+    bottle.run(app=app,host='localhost',port=8080)
+#run(host='0.0.0.0', port=8080)
